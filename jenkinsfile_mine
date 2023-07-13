@@ -1,0 +1,40 @@
+pipeline{
+    agent any
+    environment{
+
+    }
+    stages{
+        stage('git checkout'){
+            step{
+                git branch: 'master', url: 'https://github.com/chowdarybvsn/e-2-e.git'
+            }
+        }
+        stage('mvn install'){
+            step{
+                sh 'mvn clean package'
+            }
+        }
+        stage('mvn test'){
+            step{
+               sh 'mvn test'
+            }
+        }
+        stage('sonar scan'){
+            step{
+               script{
+                  withSonarQubeEnv(credentialsId: 'mysonar') {
+                       sh 'mvn sonar:sonar'
+                  }
+               }
+            }
+        }
+        stage('quality gates'){
+            step{
+               script{
+                waitForQualityGate abortPipeline: false, credentialsId: 'mysonar'
+               }
+            }
+        }
+        
+    }      
+}
