@@ -5,22 +5,22 @@ pipeline{
     }
     stages{
         stage('git checkout'){
-            step{
+            steps{
                 git branch: 'master', url: 'https://github.com/chowdarybvsn/e-2-e.git'
             }
         }
         stage('mvn install'){
-            step{
+            steps{
                 sh 'mvn clean package'
             }
         }
         stage('mvn test'){
-            step{
+            steps{
                sh 'mvn test'
             }
         }
         stage('sonar scan'){
-            step{
+            steps{
                script{
                   withSonarQubeEnv(credentialsId: 'mysonar') {
                        sh 'mvn sonar:sonar'
@@ -29,7 +29,7 @@ pipeline{
             }
         }
         stage('quality gates'){
-            step{
+            steps{
                script{
                 waitForQualityGate abortPipeline: false, credentialsId: 'mysonar'
                }
